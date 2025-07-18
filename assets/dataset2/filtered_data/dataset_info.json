@@ -1,0 +1,77 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "audio_path": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "speaker_id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "start_time": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "end_time": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "duration": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "transcription": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "emotion": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "pauses": {
+      "feature": {
+        "feature": {
+          "dtype": "float64",
+          "_type": "Value"
+        },
+        "_type": "Sequence"
+      },
+      "_type": "Sequence"
+    },
+    "pitch_mean": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "pitch_range": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "intensity_mean": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "tempo": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "prosody_tokens": {
+      "feature": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "prosody": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "annotation": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}
