@@ -37,7 +37,7 @@
             "pin_memory": true
         },
         "offload_param": {
-            "device": "cuda",
+            "device": "none",
             "pin_memory": true
         },
         "overlap_comm": true,
