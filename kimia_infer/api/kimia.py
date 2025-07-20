@@ -13,16 +13,10 @@ from huggingface_hub import snapshot_download
 
 class KimiAudio(object):
     def __init__(self, model_path: str, load_detokenizer: bool = True):
-        logger.info(f"Loading kimi-audio main model")
-
-        if os.path.exists(model_path):
-            # local path
-            cache_path = model_path
-        else:
-            # cache everything if model_path is a model-id
-            cache_path = snapshot_download(model_path)
-    
+        
+        cache_path = resolve_model_path(model_path)
         logger.info(f"Looking for resources in {cache_path}")
+        
         logger.info(f"Loading whisper model")
         self.alm = AutoModelForCausalLM.from_pretrained(
             cache_path, torch_dtype=torch.bfloat16, trust_remote_code=True
@@ -221,9 +215,6 @@ class KimiAudio(object):
         text_repetition_window_size=16,
         max_new_tokens=-1,
     ):
-        ## TODO: 需要一个check函数，检查输入的history格式是否合法
-        ## 比如，对于ASR任务，一定是: text-instruction/audio-instruction + audio-content, 我理解content和instruction是不能换位置的
-        ## assistant前必须有user等等，我觉得最好做一下check
 
         assert output_type in ["text", "both"]
 
@@ -285,8 +276,8 @@ class KimiAudio(object):
         if self.detokenizer is None:
             raise ValueError("Detokenizer is not initialized")
         self.detokenizer.clear_states()
-        chunk_size = 30  # hard-coded right now
-        first_chunk_size = 30
+        chunk_size = 80  # hard-coded right now
+        first_chunk_size = 80
         cache_speech_collection = []
         audio_tokens = audio_tokens.to(torch.cuda.current_device())
         audio_tokens = audio_tokens.long()
@@ -320,3 +311,6 @@ class KimiAudio(object):
                 break
             valid_text_ids.append(x)
         return self.prompt_manager.text_tokenizer.decode(valid_text_ids)
+        
+    def resolve_model_path(path_or_repo):
+        return path_or_repo if os.path.exists(path_or_repo) else snapshot_download(path_or_repo)
