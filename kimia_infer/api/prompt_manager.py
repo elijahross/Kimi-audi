@@ -151,6 +151,11 @@ class KimiAPromptManager:
             kimia_content_msg.text_extend(text_tokens)
             text_pad_tokens = (self.kimia_text_audiodelaytokens + len(speech_tokens) - len(text_tokens)) * [self.extra_tokens.kimia_text_blank]
             kimia_content_msg.text_extend(text_pad_tokens)
+            
+        elif message["message_type"] == "phoneme":
+            phoneme_tokens = self._tokenize_text(message["content"])  # optional: separate phoneme vocab
+            kimia_content_msg.text_extend(phoneme_tokens)
+            kimia_content_msg.audio_extend([self.extra_tokens.kimia_text_blank] * len(phoneme_tokens))
 
         elif message["message_type"] == None:
             pass
