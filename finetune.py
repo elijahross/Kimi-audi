@@ -74,16 +74,36 @@ def rank0_print(*args):
     if local_rank == 0:
         print(*args)
 
-
 def safe_save_model_for_hf_trainer(trainer: transformers.Trainer, output_dir: str):
-    """Collects the state dict and dump to disk."""
-    # check if zero3 mode enabled
-    if deepspeed.is_deepspeed_zero3_enabled():
-        state_dict = trainer.model_wrapped._zero3_consolidated_16bit_state_dict()
-    else:
+    """Collects the state dict and dump to disk safely, with error handling."""
+    try:
+        # Try to gather state dict
+        if deepspeed.is_deepspeed_zero3_enabled():
+            try:
+                state_dict = trainer.model._zero3_consolidated_16bit_state_dict()
+            except AttributeError:
+                print("⚠️ Warning: 'model_wrapped' not found. Falling back to 'model'.")
+                state_dict = trainer.model.state_dict()
+        else:
+            state_dict = trainer.model.state_dict()
+    except Exception as e:
+        print(f"🔥 Failed to consolidate state_dict: {e}")
+        print("⚠️ Falling back to model.state_dict()")
         state_dict = trainer.model.state_dict()
+
+    # Attempt saving
     if trainer.args.should_save and trainer.args.local_rank == 0:
-        trainer._save(output_dir, state_dict=state_dict)
+        try:
+            trainer._save(output_dir, state_dict=state_dict)
+            print(f"✅ Model saved successfully to {output_dir}")
+        except Exception as e:
+            print(f"🔥 Failed to save model to {output_dir}: {e}")
+            try:
+                print("⚠️ Retrying with `trainer.save_model()` fallback...")
+                trainer.save_model(output_dir)
+                print(f"✅ Fallback model save succeeded to {output_dir}")
+            except Exception as e2:
+                print(f"❌ Fallback save also failed: {e2}")
 
 
 
